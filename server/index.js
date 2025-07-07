@@ -3,18 +3,17 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 require('dotenv').config();
 
-const { Configuration, OpenAIApi } = require('openai');
+const OpenAI = require('openai');
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
 const app = express();
 const port = process.env.PORT || 8080;
 
 app.use(cors());
 app.use(bodyParser.json());
-
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-const openai = new OpenAIApi(configuration);
 
 // Prompts fijos
 const PROMPTS = {
@@ -39,8 +38,7 @@ o	Refutación o Excepción (Rebuttal): ¿Se consideran objeciones o condiciones 
 o	Evalúa la claridad, relevancia y suficiencia de los datos y la argumentación.
 o	Señala puntos fuertes y posibles debilidades o ausencias en la estructura argumentativa. 
 o	Presenta tu análisis con claridad, usando un esquema numerado y separado para cada afirmación.
-Texto a analizar:
-`,
+Texto a analizar:\n`,
   factibilidad: `Analiza la metodología propuesta en el siguiente proyecto de Tesis y responde a cada uno de los puntos detallados:
 1.	Construcción de datos primarios: ¿La metodología contempla la recolección de datos primarios (por ejemplo, encuestas, entrevistas, experimentos)? ¿Se describe claramente cómo se construirán y recolectarán estos datos?
 2.	Levantamiento de datos: ¿Se explican de manera precisa los procedimientos para el levantamiento de datos? ¿Se identifican claramente las fuentes y el acceso a los participantes o datos necesarios?
@@ -50,8 +48,7 @@ Texto a analizar:
 Al final, brinda una evaluación general:
 A.	¿La metodología propuesta es factible para llevar adelante el proyecto de Tesis, considerando los recursos, tiempos y acceso a la información?
 B.	¿Qué aspectos deberían mejorarse o aclararse para garantizar la viabilidad del trabajo?
-Texto a analizar:
-`,
+Texto a analizar:\n`,
   pertinencia: `Analiza la lista de referencias bibliográficas bajo el título del proyecto de Tesis (el título del proyecto de Tesis define el tema específico):
 Para cada referencia, responde lo siguiente:
 1.	Relevancia temática: ¿La obra citada aborda de manera directa o significativa el tema central de la tesis? ¿Por qué?
@@ -62,8 +59,7 @@ Para cada referencia, responde lo siguiente:
 Al final, brinda una evaluación general:
 A.	¿La bibliografía seleccionada es pertinente en el marco del tema del proyecto de Tesis?
 B.	¿Qué fuentes deberían reemplazarse, eliminarse o complementarse para mejorar la pertinencia bibliográfica?
-Texto a analizar:
-`,
+Texto a analizar:\n`,
 };
 
 app.post('/api/test', async (req, res) => {
@@ -78,16 +74,16 @@ app.post('/api/test', async (req, res) => {
 
   try {
     const fullPrompt = PROMPTS[type] + text;
-    const completion = await openai.createChatCompletion({
+    const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
       messages: [{ role: 'user', content: fullPrompt }],
       max_tokens: 1200,
       temperature: 0.4,
     });
-    const answer = completion.data.choices[0].message.content;
+    const answer = completion.choices[0].message.content;
     res.json({ answer });
   } catch (err) {
-    console.error(err.response?.data || err.message);
+    console.error(err?.response?.data || err.message || err);
     res.status(500).json({ error: 'Error al consultar la IA.' });
   }
 });
