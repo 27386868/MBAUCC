@@ -12,6 +12,11 @@ export default function FieldWithTest({ label, button, placeholder, testType, sp
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState('');
 
+  // URL dinámica para dev y producción (Render)
+  const API_URL = import.meta.env.PROD
+    ? 'https://mbaucc.onrender.com/api/test'
+    : '/api/test';
+
   const handleTest = async () => {
     setErr('');
     setAnswer('');
@@ -29,10 +34,14 @@ export default function FieldWithTest({ label, button, placeholder, testType, sp
     }
     setLoading(true);
     try {
-      const { data } = await axios.post('/api/test', { type: testType, text });
+      const { data } = await axios.post(API_URL, { type: testType, text });
       setAnswer(data.answer);
     } catch (e) {
-      setErr('Ocurrió un error consultando la IA.');
+      setErr(
+        e.response?.data?.error
+          ? "Error: " + e.response.data.error
+          : "Ocurrió un error consultando la IA o el servidor. ¿El backend está online?"
+      );
     }
     setLoading(false);
   };
@@ -68,7 +77,9 @@ export default function FieldWithTest({ label, button, placeholder, testType, sp
         </button>
         {loading && <span style={spinnerStyle} />}
       </div>
+      {/* Mensaje de error visible */}
       {err && <div style={{ color: "#c0372b", marginTop: 8, fontWeight: 600 }}>{err}</div>}
+      {/* Respuesta de la IA visible */}
       {answer &&
         <div style={{
           background: "#f4f8fd", color: "#183360", marginTop: 24, borderRadius: 9,
