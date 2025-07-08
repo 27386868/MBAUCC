@@ -67,7 +67,7 @@ export default function FieldWithTest({ label, button, placeholder, testType, sp
         <button
           onClick={handleTest}
           style={{
-            background: "linear-gradient(90deg,#2e5b8a 80%,#c6b46b 100%)",
+            background: "#225080",
             color: "#fff", border: "none", borderRadius: 8, padding: "12px 28px",
             fontWeight: 700, fontSize: 17, cursor: "pointer", transition: ".2s",
             boxShadow: "0 2px 12px #22508020"

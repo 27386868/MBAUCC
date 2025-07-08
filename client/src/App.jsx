@@ -38,7 +38,7 @@ export default function App() {
         <FieldWithTest
           label="Introducción"
           button="Test de Toulmin"
-          placeholder="Pega aquí la introducción de tu Trabajo Final..."
+          placeholder="Pega aquí la introducción de tu proyecto..."
           testType="toulmin"
         />
         <FieldWithTest
@@ -56,7 +56,7 @@ export default function App() {
         />
       </main>
       <footer style={{ fontSize: 15, color: "#8699b5", padding: "18px 0" }}>
-        © 2024 - MBA UCC. App desarrollada para uso académico.
+        © 2025 - MBA UCC. App desarrollada para uso académico.
       </footer>
     </div>
   );
